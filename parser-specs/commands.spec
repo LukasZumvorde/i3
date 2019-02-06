@@ -15,6 +15,7 @@ state INITIAL:
   end ->
   '[' -> call cmd_criteria_init(); CRITERIA
   'move' -> MOVE
+  'moveandsplit' -> MOVE_AND_SPLIT
   'exec' -> EXEC
   'exit' -> call cmd_exit()
   'restart' -> call cmd_restart()
@@ -364,11 +365,50 @@ state MOVE:
   method = 'absolute'
       -> MOVE_TO_ABSOLUTE_POSITION
 
+# moveandsplit <direction> [<pixels> [px]]
+# moveandsplit [window|container] [to] workspace [<str>|next|prev|next_on_output|prev_on_output|current]
+# moveandsplit [window|container] [to] output <str>
+# moveandsplit [window|container] [to] mark <str>
+# moveandsplit [window|container] [to] scratchpad
+# moveandsplit workspace to [output] <str>
+# moveandsplit scratchpad
+# moveandsplit [window|container] [to] [absolute] position [ [<pixels> [px] <pixels> [px]] | center ]
+# moveandsplit [window|container] [to] position mouse|cursor|pointer
+state MOVE_AND_SPLIT:
+  'window'
+      ->
+  'container'
+      ->
+  'to'
+      ->
+  no_auto_back_and_forth = '--no-auto-back-and-forth'
+      ->
+  'workspace'
+      -> MOVE_WORKSPACE
+  'output'
+      -> MOVE_TO_OUTPUT
+  'mark'
+      -> MOVE_TO_MARK
+  'scratchpad'
+      -> call cmd_move_scratchpad()
+  direction = 'left', 'right', 'up', 'down'
+      -> MOVE_AND_SPLIT_DIRECTION
+  method = 'position'
+      -> MOVE_TO_POSITION
+  method = 'absolute'
+      -> MOVE_TO_ABSOLUTE_POSITION
+
 state MOVE_DIRECTION:
   pixels = number
       -> MOVE_DIRECTION_PX
   end
       -> call cmd_move_direction($direction, 10)
+
+state MOVE_AND_SPLIT_DIRECTION:
+  pixels = number
+      -> MOVE_DIRECTION_PX
+  end
+      -> call cmd_move_and_split_direction($direction, 10)
 
 state MOVE_DIRECTION_PX:
   'px'

@@ -18,6 +18,13 @@
  */
 void tree_move(Con *con, int direction);
 
+/**
+ * Moves the given container in the given direction and creates a new split if necessary  (TOK_LEFT, TOK_RIGHT,
+ * TOK_UP, TOK_DOWN from cmdparse.l)
+ *
+ */
+void tree_move_and_split(Con *con, int direction);
+
 typedef enum { BEFORE,
                AFTER } position_t;
 

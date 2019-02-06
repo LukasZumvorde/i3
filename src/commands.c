@@ -1505,6 +1505,54 @@ void cmd_move_direction(I3_CMD, const char *direction_str, long move_px) {
     ysuccess(true);
 }
 
+
+/*
+ * Implementation of 'moveandsplit <direction> [<pixels> [px]]'.
+ *
+ */
+void cmd_move_and_split_direction(I3_CMD, const char *direction_str, long move_px) {
+    owindow *current;
+    HANDLE_EMPTY_MATCH;
+
+    Con *initially_focused = focused;
+    direction_t direction = parse_direction(direction_str);
+
+    TAILQ_FOREACH(current, &owindows, owindows) {
+        DLOG("moving in direction %s, px %ld\n", direction_str, move_px);
+        if (con_is_floating(current->con)) {
+            DLOG("floating move with %ld pixels\n", move_px);
+            Rect newrect = current->con->parent->rect;
+
+            switch (direction) {
+                case D_LEFT:
+                    newrect.x -= move_px;
+                    break;
+                case D_RIGHT:
+                    newrect.x += move_px;
+                    break;
+                case D_UP:
+                    newrect.y -= move_px;
+                    break;
+                case D_DOWN:
+                    newrect.y += move_px;
+                    break;
+            }
+
+            floating_reposition(current->con->parent, newrect);
+        } else {
+            tree_move_and_split(current->con, direction);
+            cmd_output->needs_tree_render = true;
+        }
+    }
+
+    /* the move command should not disturb focus */
+    if (focused != initially_focused)
+        con_activate(initially_focused);
+
+    // XXX: default reply for now, make this a better reply
+    ysuccess(true);
+}
+
 /*
  * Implementation of 'layout default|stacked|stacking|tabbed|splitv|splith'.
  *
