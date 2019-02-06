@@ -14,8 +14,8 @@ state INITIAL:
   # function without using an explicit 'end' token.
   end ->
   '[' -> call cmd_criteria_init(); CRITERIA
-  'move' -> MOVE
   'moveandsplit' -> MOVE_AND_SPLIT
+  'move' -> MOVE
   'exec' -> EXEC
   'exit' -> call cmd_exit()
   'restart' -> call cmd_restart()
